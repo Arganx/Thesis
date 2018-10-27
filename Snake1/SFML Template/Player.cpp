@@ -6,6 +6,18 @@ Player::Player(int x, int y)
 {
 	this->position.x = x;
 	this->position.y = y;
+
+	if (!texture.loadFromFile("./src/textures/player.png"))
+	{
+		//TODO error
+	}
+	else
+	{
+		this->textureRect.left = 20;
+		this->textureRect.top = 18;
+		this->textureRect.width = 20;
+		this->textureRect.height = 19;
+	}
 }
 
 

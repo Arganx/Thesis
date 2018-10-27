@@ -5,7 +5,7 @@
 
 Field::Field(int size,int positionX,int positionY)
 {
-	this->body.setSize(sf::Vector2f((float)size, (float)size));
+	body = sf::RectangleShape(sf::Vector2f((float)size, (float)size));
 	this->body.setFillColor(sf::Color::White);
 	this->body.setPosition((float)positionX, (float)positionY);
 	this->state = 0;
@@ -23,10 +23,13 @@ void Field::setState(int state)
 	if (state == 0)
 	{
 		this->body.setFillColor(sf::Color::White);
+		this->body.setTexture(NULL);
 	}
 	else if (state == 1)
 	{
-		this->body.setFillColor(sf::Color::Red);
+		//this->body.setFillColor(sf::Color::Red);
+		this->body.setTexture(player);
+		this->body.setTextureRect(*textureRect);
 	}
 	else if (state == 2)
 	{
@@ -41,5 +44,11 @@ void Field::setState(int state)
 		this->body.setFillColor(sf::Color::Black);
 	}
 
+}
+
+void Field::setTexture(sf::Texture * texture, sf::IntRect* textureRect)
+{
+	player = texture;
+	this->textureRect = textureRect;
 }
 

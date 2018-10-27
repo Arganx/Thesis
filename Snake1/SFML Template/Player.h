@@ -10,7 +10,11 @@ public:
 	void moveRight();
 	void moveUp();
 	void moveDown();
+	sf::Texture* getPlayerTexture() { return &texture; };
+	sf::IntRect* getTextureRect() { return &textureRect; };
 private:
 	sf::Vector2i position;
+	sf::Texture texture;
+	sf::IntRect textureRect;
 };
 

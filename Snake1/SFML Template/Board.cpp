@@ -21,6 +21,7 @@ Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 		for (int j = 0; j < size_x; j++)//width
 		{
 			fields[i][j] = new Field((windowSize -200)/size_x, positionX, positionY);
+			fields[i][j]->setTexture(this->player.getPlayerTexture(),this->player.getTextureRect());
 			positionY += (windowSize -200) / size_y +1;
 			
 		}

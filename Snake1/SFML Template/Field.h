@@ -8,8 +8,11 @@ public:
 	sf::RectangleShape getBody() { return body; };
 	int getState() { return state; };
 	void setState(int state);
+	void setTexture(sf::Texture* texture,sf::IntRect* textureRect);
 private:
 	int state;
 	sf::RectangleShape body;
+	sf::Texture* player;
+	sf::IntRect* textureRect;
 };
 

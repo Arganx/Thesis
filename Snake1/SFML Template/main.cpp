@@ -5,7 +5,7 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280,720),"SFML Template");
 	Player player(2,2);
-	Board board(3,3, 1280, 720,player);
+	Board board(30,30, 1280, 720,player);
 	window.setFramerateLimit(30);
 
 	while (window.isOpen())
