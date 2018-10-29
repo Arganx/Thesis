@@ -1,23 +1,15 @@
 #pragma once
-#include <string>
+#include "ItemType.h"
+#include "SFML/Graphics.hpp"
 class Item
 {
 public:
-	Item();
+	Item(ItemType* type, int x,int y);
 	~Item();
+	sf::Vector2i getPosition() { return position; };
+	ItemType* getType() { return type; };
 private:
-	std::string name;
-
-	int size;
-	int color;
-	int shape;
-	int colorDifference;
-	int epicLevel;
-
-	int strength;
-	int dexterity;
-	int armor;
-	int magic;
-	int health;
+	ItemType* type;
+	sf::Vector2i position;
 };
 

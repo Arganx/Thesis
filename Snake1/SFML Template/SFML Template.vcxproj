@@ -152,6 +152,8 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Items.cpp" />
+    <ClCompile Include="ItemType.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
@@ -159,6 +161,8 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="Items.h" />
+    <ClInclude Include="ItemType.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>

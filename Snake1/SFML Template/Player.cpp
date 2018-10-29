@@ -17,6 +17,8 @@ Player::Player(int x, int y)
 		this->textureRect.top = 18;
 		this->textureRect.width = 20;
 		this->textureRect.height = 19;
+		this->strength = 0;
+		this->magic = 0;
 	}
 }
 

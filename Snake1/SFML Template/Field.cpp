@@ -17,8 +17,9 @@ Field::~Field()
 {
 }
 
-void Field::setState(int state)
+void Field::setState(int state,ItemType* itemType)
 {
+	this->itemtype = itemType;
 	this->state = state;
 	if (state == 0)
 	{
@@ -41,7 +42,13 @@ void Field::setState(int state)
 	}
 	else if (state == 4)
 	{
-		this->body.setFillColor(sf::Color::Black);
+		//this->body.setFillColor(sf::Color::Black);
+		this->body.setTexture(itemType->getTexture());
+
+	}
+	else if (state == 5)
+	{
+		this->body.setTexture(itemType->getTexture());
 	}
 
 }

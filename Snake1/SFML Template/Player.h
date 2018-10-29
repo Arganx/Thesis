@@ -16,5 +16,7 @@ private:
 	sf::Vector2i position;
 	sf::Texture texture;
 	sf::IntRect textureRect;
+	int strength;
+	int magic;
 };
 

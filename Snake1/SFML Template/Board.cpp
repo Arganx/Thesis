@@ -109,3 +109,25 @@ void Board::goDown()
 		fields[player.getPosition().x][player.getPosition().y]->setState(1);
 	}
 }
+
+bool Board::checkField(int x, int y)
+//Check if field is empty
+{
+	if (x<0 || x>size_x - 1 || y<0 || y>size_y - 1)
+	{
+		return false;
+	}
+	if (fields[x][y]->getState() == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void Board::setItem(Item* item)
+{
+	fields[item->getPosition().x][item->getPosition().y]->setState(item->getType()->getState(),item->getType());
+}

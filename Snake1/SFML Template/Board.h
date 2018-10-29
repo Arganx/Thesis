@@ -3,6 +3,7 @@
 #include <string>
 #include "Field.h"
 #include "Player.h"
+#include "Item.h"
 class Board
 {
 public:
@@ -13,6 +14,10 @@ public:
 	void goRight();
 	void goUp();
 	void goDown();
+	int getSizeX() { return size_x; };
+	int getSizeY() { return size_y; };
+	bool checkField(int x, int y);
+	void setItem(Item* item);
 private:
 	Field*** fields;
 	int size_x;
