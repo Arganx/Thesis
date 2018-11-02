@@ -5,12 +5,17 @@
 Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	:player(player)
 {
+	items = new Items;
 	this->size_x = sizeX;
 	this->size_y = sizeY;
 	int windowSize = std::min(windowSizeX,windowSizeY);
 	int positionX = windowSizeX/2 - ((windowSize - 200) + (sizeX-1)*1)/2 ;
 	int positionY = windowSizeY/2 - ((windowSize - 200)/size_x*sizeY + (sizeY - 1) * 1)/2;
 
+	if (!gateTexture.loadFromFile("./src/textures/gate.png"))
+	{
+		//TODO throw error
+	}
 
 
 	//Create fields
@@ -39,8 +44,10 @@ Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	//	std::cout << std::endl;
 	//}
 	fields[player.getPosition().x][player.getPosition().y]->setState(1);
-
+	createItems(10);
+	setDoor();
 }
+
 
 
 Board::~Board()
@@ -54,6 +61,7 @@ Board::~Board()
 		delete[] fields[i];
 	}
 	delete [] fields;
+	delete items;
 }
 
 void Board::draw(sf::RenderWindow & window)
@@ -67,12 +75,15 @@ void Board::draw(sf::RenderWindow & window)
 	}
 }
 
+
+
 void Board::goLeft()
 {
 	if (player.getPosition().x>0)
 	{
 		fields[player.getPosition().x][player.getPosition().y]->setState(0);
 		player.moveLeft();
+		checkIfItem();
 		fields[player.getPosition().x][player.getPosition().y]->setState(1);
 	}
 
@@ -86,6 +97,7 @@ void Board::goRight()
 	{
 		fields[player.getPosition().x][player.getPosition().y]->setState(0);
 		player.moveRight();
+		checkIfItem();
 		fields[player.getPosition().x][player.getPosition().y]->setState(1);
 	}
 }
@@ -96,6 +108,7 @@ void Board::goUp()
 	{
 		fields[player.getPosition().x][player.getPosition().y]->setState(0);
 		player.moveUp();
+		checkIfItem();
 		fields[player.getPosition().x][player.getPosition().y]->setState(1);
 	}
 }
@@ -106,6 +119,7 @@ void Board::goDown()
 	{
 		fields[player.getPosition().x][player.getPosition().y]->setState(0);
 		player.moveDown();
+		checkIfItem();
 		fields[player.getPosition().x][player.getPosition().y]->setState(1);
 	}
 }
@@ -130,4 +144,82 @@ bool Board::checkField(int x, int y)
 void Board::setItem(Item* item)
 {
 	fields[item->getPosition().x][item->getPosition().y]->setState(item->getType()->getState(),item->getType());
+}
+
+bool Board::createItemOnBoard(int numberOnList)//TODO limit number of loop iterations
+{
+	srand(time(NULL));
+	int x = -1;
+	int y = -1;
+	while (!this->checkField(x, y))
+	{
+		x = rand() % this->getSizeX();
+		y = rand() % this->getSizeY();
+	}
+	std::cout << "Wybrane pozycje to: " << x << " oraz " << y << std::endl;
+	Item* itemOne = new Item(&items->getItemTypes()[numberOnList], x, y);
+	items->itemList.push_front(*itemOne);
+
+	this->setItem(itemOne);
+
+
+	return false;
+}
+
+void Board::resetBoard(int numberofItems)
+{
+	items->itemList.clear();
+	player.resetPosition();
+	for (int i = 0; i < size_x; i++)
+	{
+		for (int j = 0; j < size_y; j++)
+		{
+			fields[i][j]->setState(0);
+		}
+	}
+	createItems(numberofItems);
+	setDoor();
+
+}
+
+void Board::setDoor()
+{
+	srand(time(NULL));
+	int x = -1;
+	int y = -1;
+	while (!this->checkField(x, y))
+	{
+		x = rand() % this->getSizeX();
+		y = rand() % this->getSizeY();
+	}
+	std::cout << "Wybrana pozycja drzwi to: " << x << " oraz " << y << std::endl;
+	fields[x][y]->setState(2,NULL,&gateTexture);
+}
+
+void Board::checkIfItem()
+{
+	int state = fields[player.getPosition().x][player.getPosition().y]->getState();
+	if (state == 2)
+	{
+		this->resetBoard(10);
+	}
+	else if (state)	//ifNotEmpty
+	{
+		ItemType* type = items->getItemByState(state);
+		player.pickUpItem(type);
+		items->removeFromItemList(player.getPosition().x, player.getPosition().y);
+		player.printPlayerState();
+	}
+}
+
+void Board::createItems(int numberOfItems)
+{
+	//Create items
+	srand(time(NULL));
+	int itemNumber = 0;
+	for (int i = 0; i < numberOfItems; i++)
+	{
+		itemNumber = rand() % this->items->getSize();
+		this->createItemOnBoard(itemNumber);
+	}
 }

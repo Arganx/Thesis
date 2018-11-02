@@ -20,6 +20,8 @@ public:
 
 	sf::Texture* getTexture() { return &texture; };
 	int getState() { return state; };
+	std::string getName() { return name; };
+	int getStrength() { return strength; };
 private:
 
 	sf::Texture texture;

@@ -6,16 +6,11 @@
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280,720),"SFML Template");
-	Player player(2,2);
-	Board board(3,3, 1280, 720,player);
+	Player player(0,0);
+	Board board(30,30, 1280, 720,player);
 	window.setFramerateLimit(30);
-	Items* items = new Items();
-	//ItemType test = items->getItemTypeList().back();
 	
-	items->createItemOnBoard(1, &board);
-	items->createItemOnBoard(0, &board);
-	items->createItemOnBoard(1, &board);
-	items->createItemOnBoard(1, &board);
+
 	
 	while (window.isOpen())
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include "ItemType.h"
-#include "Board.h"
+#include "Item.h"
 class Items
 {
 public:
@@ -9,11 +9,15 @@ public:
 	~Items();
 
 	ItemType* getItemTypes() { return types; };
-	bool createItemOnBoard(int numberOnList,Board* board);
+	ItemType* getItemByState(int state);
+	void removeFromItemList(int x, int y);
+	int getSize() { return size; };
 
 public:
 	ItemType* types;
 	std::list<Item> itemList;
+private:
+	int size;
 
 };
 

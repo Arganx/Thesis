@@ -8,7 +8,7 @@ public:
 	~Field();
 	sf::RectangleShape getBody() { return body; };
 	int getState() { return state; };
-	void setState(int state, ItemType* itemType = NULL);
+	void setState(int state, ItemType* itemType = NULL,sf::Texture* gate = NULL);
 	void setTexture(sf::Texture* texture,sf::IntRect* textureRect);
 private:
 	int state;

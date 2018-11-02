@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include "ItemType.h"
 class Player
 {
 public:
@@ -12,6 +13,9 @@ public:
 	void moveDown();
 	sf::Texture* getPlayerTexture() { return &texture; };
 	sf::IntRect* getTextureRect() { return &textureRect; };
+	void printPlayerState();
+	void pickUpItem(ItemType* itemType);
+	void resetPosition();
 private:
 	sf::Vector2i position;
 	sf::Texture texture;

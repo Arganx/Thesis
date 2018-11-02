@@ -47,4 +47,21 @@ void Player::moveDown()
 	position.y++;
 }
 
+void Player::printPlayerState()
+{
+	std::cout << "Player: strength - " << strength << " magic - " << magic << std::endl;
+}
+
+void Player::pickUpItem(ItemType * itemType)
+{
+	std::cout << "Picked up " << itemType->getName() << std::endl;
+	strength += itemType->getStrength();
+}
+
+void Player::resetPosition()
+{
+	position.x = 0;
+	position.y = 0;
+}
+
 

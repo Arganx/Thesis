@@ -17,7 +17,7 @@ Field::~Field()
 {
 }
 
-void Field::setState(int state,ItemType* itemType)
+void Field::setState(int state,ItemType* itemType,sf::Texture* gate)
 {
 	this->itemtype = itemType;
 	this->state = state;
@@ -32,9 +32,16 @@ void Field::setState(int state,ItemType* itemType)
 		this->body.setTexture(player);
 		this->body.setTextureRect(*textureRect);
 	}
-	else if (state == 2)
+	else if (state == 2)	//gate
 	{
-		this->body.setFillColor(sf::Color::Green);
+		sf::IntRect rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.width = gate->getSize().x;
+		rect.height = gate->getSize().y;
+		this->body.setTexture(gate);
+		this->body.setTextureRect(rect);
+
 	}
 	else if (state == 3)
 	{
@@ -43,12 +50,24 @@ void Field::setState(int state,ItemType* itemType)
 	else if (state == 4)
 	{
 		//this->body.setFillColor(sf::Color::Black);
+		sf::IntRect rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.width = itemType->getTexture()->getSize().x;
+		rect.height = itemType->getTexture()->getSize().y;
 		this->body.setTexture(itemType->getTexture());
+		this->body.setTextureRect(rect);
 
 	}
 	else if (state == 5)
 	{
+		sf::IntRect rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.width = itemType->getTexture()->getSize().x;
+		rect.height = itemType->getTexture()->getSize().y;
 		this->body.setTexture(itemType->getTexture());
+		this->body.setTextureRect(rect);
 	}
 
 }
