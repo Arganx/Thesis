@@ -12,6 +12,8 @@ public:
 	ItemType* getItemByState(int state);
 	void removeFromItemList(int x, int y);
 	int getSize() { return size; };
+	void sortListByDistance(sf::Vector2i player);
+	std::list<Item> getItemList() { return itemList; };
 
 public:
 	ItemType* types;

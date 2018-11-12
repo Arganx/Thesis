@@ -7,9 +7,8 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280,720),"SFML Template");
 	Player player(0,0);
-	Board board(30,30, 1280, 720,player);
+	Board board(10,10, 1280, 720,player);
 	window.setFramerateLimit(30);
-	
 
 	
 	while (window.isOpen())
@@ -25,22 +24,25 @@ int main()
 				window.close();
 				break;
 			case sf::Event::EventType::KeyPressed:
-				switch (mainEvent.key.code)
+				if (board.getPlayerCanMove())
 				{
-				case sf::Keyboard::A:
-					board.goLeft();
-					break;
-				case sf::Keyboard::D:
-					board.goRight();
-					break;
-				case sf::Keyboard::W:
-					board.goUp();
-					break;
-				case sf::Keyboard::S:
-					board.goDown();
-					break;
-				default:
-					break;
+					switch (mainEvent.key.code)
+					{
+					case sf::Keyboard::A:
+						board.goLeft();
+						break;
+					case sf::Keyboard::D:
+						board.goRight();
+						break;
+					case sf::Keyboard::W:
+						board.goUp();
+						break;
+					case sf::Keyboard::S:
+						board.goDown();
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}

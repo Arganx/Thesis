@@ -1,11 +1,13 @@
 #include "Board.h"
 #include <iostream>
-
+#include <thread>
 
 Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	:player(player)
 {
 	items = new Items;
+	pathFinding = new PathFinding;
+	playerCanMove = true;
 	this->size_x = sizeX;
 	this->size_y = sizeY;
 	int windowSize = std::min(windowSizeX,windowSizeY);
@@ -44,8 +46,25 @@ Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	//	std::cout << std::endl;
 	//}
 	fields[player.getPosition().x][player.getPosition().y]->setState(1);
-	createItems(10);
 	setDoor();
+	setDoor();
+	setDoor();
+	createItems(10);
+	//std::cout << "List before" << std::endl << std::endl;
+	//for (auto v : items->itemList)
+	//{
+	//	std::cout << "Name: " << v.getType()->getName() << "\n";
+	//	std::cout << "x: " << v.getPosition().x << " y:" << v.getPosition().y << "\n";
+	//}
+		
+	items->sortListByDistance(player.getPosition());
+	//std::cout << "List after" << std::endl << std::endl;
+	//for (auto v : items->itemList)
+	//{
+	//	std::cout << "Name: " << v.getType()->getName() << "\n";
+	//	std::cout << "x: " << v.getPosition().x << " y:" << v.getPosition().y << "\n";
+	//}
+	//setDoor();
 }
 
 
@@ -62,6 +81,7 @@ Board::~Board()
 	}
 	delete [] fields;
 	delete items;
+	delete pathFinding;
 }
 
 void Board::draw(sf::RenderWindow & window)
@@ -151,7 +171,7 @@ bool Board::createItemOnBoard(int numberOnList)//TODO limit number of loop itera
 	srand(time(NULL));
 	int x = -1;
 	int y = -1;
-	while (!this->checkField(x, y))
+	while (!this->checkField(x, y) || !this->checkField(x+1, y) || !this->checkField(x - 1, y) || !this->checkField(x, y+1) || !this->checkField(x, y-1) || !this->checkField(x + 1, y+1) || !this->checkField(x + 1, y-1) || !this->checkField(x - 1, y-1) || !this->checkField(x - 1, y+1))
 	{
 		x = rand() % this->getSizeX();
 		y = rand() % this->getSizeY();
@@ -187,13 +207,207 @@ void Board::setDoor()
 	srand(time(NULL));
 	int x = -1;
 	int y = -1;
-	while (!this->checkField(x, y))
+	while (!this->checkField(x, y) || !this->checkField(x + 1, y) || !this->checkField(x - 1, y) || !this->checkField(x, y + 1) || !this->checkField(x, y - 1) || !this->checkField(x + 1, y + 1) || !this->checkField(x + 1, y - 1) || !this->checkField(x - 1, y - 1) || !this->checkField(x - 1, y + 1))
 	{
 		x = rand() % this->getSizeX();
 		y = rand() % this->getSizeY();
 	}
 	std::cout << "Wybrana pozycja drzwi to: " << x << " oraz " << y << std::endl;
 	fields[x][y]->setState(2,NULL,&gateTexture);
+}
+
+
+void rightBlocked(Board* board)
+{
+	board->goUp();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goRight();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goRight();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goDown();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void upBlocked(Board* board)
+{
+	board->goRight();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goUp();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goUp();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goLeft();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void leftBlocked(Board* board)
+{
+	board->goUp();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goLeft();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goLeft();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goDown();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void downBlocked(Board* board)
+{
+	board->goRight();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goDown();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goDown();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	board->goLeft();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void threadFunction(Board* board,sf::Vector2i distance)
+{
+	//TODO omijanie drzwi, przedmioty musza miec pusta przestrzen dookola
+	board->setPlayerCanMove(false);
+	std::this_thread::sleep_for(std::chrono::microseconds(10));
+	board->setPlayerCanMove(false);
+
+
+
+	std::cout << "Thread" << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	if (distance.x > 0)
+	{
+		for (int i = 0; i < distance.x-1; i++)
+		{
+			if (board->checkField(board->getRealPlayer()->getPosition().x+1, board->getRealPlayer()->getPosition().y))
+			{
+				//std::cout << "X: " << board->getRealPlayer()->getPosition().x + 1 << " Y: " << board->getRealPlayer()->getPosition().y << " clear" <<std::endl;
+				board->goRight();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+			else
+			{
+				rightBlocked(board);
+				i++;
+				//std::cout << "rightBlocked x: " << board->getRealPlayer()->getPosition().x + 1 << " y: " <<board->getRealPlayer()->getPosition().y << std::endl;
+			}
+		}
+		//Prezdmiot na zakrecie
+		if (distance.y != 0 && !board->checkField(board->getRealPlayer()->getPosition().x + 1, board->getRealPlayer()->getPosition().y))
+		{
+			if (distance.y > 0)	//w dol
+			{
+				board->goDown();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				board->goRight();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				distance.y--;
+			}
+			else
+			{
+				board->goUp();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				board->goRight();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				distance.y++;
+			}
+		}
+		else
+		{
+			board->goRight();
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	}
+	else if(distance.x<0)
+	{
+
+		for (int i = 0; i < (distance.x*-1)-1; i++)
+		{
+			if (board->checkField(board->getRealPlayer()->getPosition().x - 1, board->getRealPlayer()->getPosition().y))
+			{
+				board->goLeft();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+			else
+			{
+				leftBlocked(board);
+				i++;
+				//std::cout << "leftBlocked" << std::endl;
+			}
+
+		}
+		if (distance.y != 0 && !board->checkField(board->getRealPlayer()->getPosition().x - 1, board->getRealPlayer()->getPosition().y))
+		{
+			if (distance.y > 0)	//w dol
+			{
+				board->goDown();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				board->goLeft();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				distance.y--;
+			}
+			else
+			{
+				board->goUp();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				board->goLeft();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+				distance.y++;
+			}
+		}
+		else
+		{
+			board->goLeft();
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	}
+
+	if (distance.y > 0)
+	{
+		for (int i = 0; i < distance.y-1; i++)
+		{
+			if (board->checkField(board->getRealPlayer()->getPosition().x, board->getRealPlayer()->getPosition().y + 1))
+			{
+				board->goDown();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+			else
+			{
+				downBlocked(board);
+				i++;
+				//std::cout << "downBlocked" << std::endl;
+			}
+
+		}
+		board->goDown();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+	else if(distance.y <0)
+	{
+		for (int i = 0; i < (distance.y*-1)-1; i++)
+		{
+			if (board->checkField(board->getRealPlayer()->getPosition().x, board->getRealPlayer()->getPosition().y - 1))
+			{
+				board->goUp();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+			else
+			{
+				upBlocked(board);
+				i++;
+				std::cout << "UpBlocked" << std::endl;
+			}
+
+		}
+		board->goUp();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+
+	std::cout << "End" << std::endl;
+
+
+	board->setPlayerCanMove(true);
 }
 
 void Board::checkIfItem()
@@ -205,10 +419,23 @@ void Board::checkIfItem()
 	}
 	else if (state)	//ifNotEmpty
 	{
+		//Podnosze item
 		ItemType* type = items->getItemByState(state);
 		player.pickUpItem(type);
 		items->removeFromItemList(player.getPosition().x, player.getPosition().y);
 		player.printPlayerState();
+		//Znalezienie drogi do nastepnego itemu
+		items->sortListByDistance(player.getPosition());
+		if (!items->getItemList().empty())
+		{
+			sf::Vector2i distance = pathFinding->findPath(player.getPosition(), items->getItemList().front().getPosition());
+			/*int x = getPlayer().getPosition().x;
+			int y = getPlayer().getPosition().y;*/
+			//Player* p = getRealPlayer();
+			std::thread t(threadFunction, this, distance);
+			t.detach();
+		}
+		//TODO thread going to the gate
 	}
 }
 
@@ -223,3 +450,4 @@ void Board::createItems(int numberOfItems)
 		this->createItemOnBoard(itemNumber);
 	}
 }
+

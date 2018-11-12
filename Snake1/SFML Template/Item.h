@@ -11,5 +11,6 @@ public:
 private:
 	ItemType* type;
 	sf::Vector2i position;
+
 };
 

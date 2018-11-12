@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Item.h"
 #include "Items.h"
+#include "PathFinding.h"
 class Board
 {
 public:
@@ -22,6 +23,10 @@ public:
 	bool createItemOnBoard(int numberOnList);
 	void resetBoard(int numberofItems);
 	void setDoor();
+	bool getPlayerCanMove() { return playerCanMove; };
+	void setPlayerCanMove(bool canMove) { this->playerCanMove = canMove; };
+	Player getPlayer() { return player; };
+	Player* getRealPlayer() { return &player; };
 private:
 	Field*** fields;
 	int size_x;
@@ -31,6 +36,8 @@ private:
 	void checkIfItem();
 	void createItems(int numberOfItems);
 	sf::Texture gateTexture;
+	PathFinding* pathFinding;
+	bool playerCanMove;
 
 };
 
