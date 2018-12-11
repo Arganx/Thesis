@@ -8,6 +8,7 @@ Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	items = new Items;
 	pathFinding = new PathFinding;
 	playerCanMove = true;
+	ai = false;
 	this->size_x = sizeX;
 	this->size_y = sizeY;
 	int windowSize = std::min(windowSizeX,windowSizeY);
@@ -425,17 +426,21 @@ void Board::checkIfItem()
 		items->removeFromItemList(player.getPosition().x, player.getPosition().y);
 		player.printPlayerState();
 		//Znalezienie drogi do nastepnego itemu
-		items->sortListByDistance(player.getPosition());
-		if (!items->getItemList().empty())
+		if (ai)
 		{
-			sf::Vector2i distance = pathFinding->findPath(player.getPosition(), items->getItemList().front().getPosition());
-			/*int x = getPlayer().getPosition().x;
-			int y = getPlayer().getPosition().y;*/
-			//Player* p = getRealPlayer();
-			std::thread t(threadFunction, this, distance);
-			t.detach();
+			items->sortListByDistance(player.getPosition());
+			if (!items->getItemList().empty())
+			{
+				sf::Vector2i distance = pathFinding->findPath(player.getPosition(), items->getItemList().front().getPosition());
+				/*int x = getPlayer().getPosition().x;
+				int y = getPlayer().getPosition().y;*/
+				//Player* p = getRealPlayer();
+				std::thread t(threadFunction, this, distance);
+				t.detach();
+			}
+			//TODO thread going to the gate
 		}
-		//TODO thread going to the gate
+		
 	}
 }
 

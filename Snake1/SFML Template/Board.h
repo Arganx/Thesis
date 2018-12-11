@@ -27,6 +27,8 @@ public:
 	void setPlayerCanMove(bool canMove) { this->playerCanMove = canMove; };
 	Player getPlayer() { return player; };
 	Player* getRealPlayer() { return &player; };
+	bool getAI() { return ai; };
+	void setAI(bool ai) { this->ai = ai; };
 private:
 	Field*** fields;
 	int size_x;
@@ -38,6 +40,7 @@ private:
 	sf::Texture gateTexture;
 	PathFinding* pathFinding;
 	bool playerCanMove;
+	bool ai;
 
 };
 

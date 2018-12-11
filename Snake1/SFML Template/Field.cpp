@@ -69,6 +69,16 @@ void Field::setState(int state,ItemType* itemType,sf::Texture* gate)
 		this->body.setTexture(itemType->getTexture());
 		this->body.setTextureRect(rect);
 	}
+	else
+	{
+		sf::IntRect rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.width = itemType->getTexture()->getSize().x;
+		rect.height = itemType->getTexture()->getSize().y;
+		this->body.setTexture(itemType->getTexture());
+		this->body.setTextureRect(rect);
+	}
 
 }
 

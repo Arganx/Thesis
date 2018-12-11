@@ -9,7 +9,7 @@ int main()
 	Player player(0,0);
 	Board board(10,10, 1280, 720,player);
 	window.setFramerateLimit(30);
-
+	board.setAI(false);
 	
 	while (window.isOpen())
 	{

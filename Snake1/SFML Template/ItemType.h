@@ -13,7 +13,6 @@ public:
 	int shape,
 	int colorDifference,
 	int epicLevel,
-	int strength,
 	std::string path,
 	int state);
 	~ItemType();
@@ -37,6 +36,7 @@ private:
 	int epicLevel;
 
 	int strength;
+	int calculateStrength(int size,int color,int shape,int colorDifference,int epicLevel);
 	//int dexterity;
 	//int armor;
 	//int magic;
