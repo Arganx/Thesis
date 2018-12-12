@@ -7,21 +7,30 @@
 
 double Neuron::activationFunction(double number)
 {
-	return number;
-
-	/*if (number > 0.0)
-	{
-		return 1.0;
-	}
-	else
-	{
-		return -1.0;
-	}*/
+	//return number;
+	return(2 / (1 + pow(exp(1), -2 * number))) - 1;
+	//if (number >= 0.0)
+	//{
+	//	return number;
+	//}
+	//else
+	//{
+	//	return 0.01*number;
+	//}
 }
 
 double Neuron::activationDerrivative(double number)
 {
-	return 1.0;
+	//return 1.0;
+	return 1 - pow(activationFunction(number), 2);
+	//if (number >= 0.0)
+	//{
+	//	return 1;
+	//}
+	//else
+	//{
+	//	return 0.01;
+	//}
 }
 
 double Neuron::sum(std::vector<double> inputs)

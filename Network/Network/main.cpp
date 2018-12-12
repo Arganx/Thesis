@@ -6,6 +6,8 @@
 #include <array>
 #include "Functions.h"
 #include "MLP.h"
+#include "Item.h"
+#include <fstream>
 int main()
 {
 	srand((unsigned)time(NULL));
@@ -63,20 +65,89 @@ int main()
 	//MLP
 	Neuron* neuron = new Neuron(2,0.1);
 	std::vector<int> neuronsInEachLayer;
-	neuronsInEachLayer.push_back(2);
-	neuronsInEachLayer.push_back(3);
-	MLP mlp = MLP(2,1,2, neuronsInEachLayer);
-	std::vector<double> input;
-	input.push_back(0.5);
-	input.push_back(0.8);
-	std::vector<double> target;
-	target.push_back(0.2);
+	neuronsInEachLayer.push_back(10);
+	neuronsInEachLayer.push_back(15);
+	MLP mlp = MLP(5,1,2, neuronsInEachLayer,"mlpWeights");
+	//Tests
+	
+	//std::vector<double> input;
+	//input.push_back(0.5);
+	//input.push_back(0.8);
+	//std::vector<double> target;
+	//target.push_back(2.2);
+	////std::cout << mlp.guess(input)[0] << std::endl;
+	//double tmp = 0;
+	//while (tmp!=1)
+	//{
+	//	tmp = mlp.train(input, target);
+	//}
 	//std::cout << mlp.guess(input)[0] << std::endl;
-	double tmp = 0;
-	while (tmp!=1)
+	
+
+
+	Functions functions;
+	std::vector<Item> inputs;
+	//Insert input
+	inputs.push_back(Item(5, 4, 0, 1, 1));
+	inputs.push_back(Item(3, 3, 5, 3, 5));
+	inputs.push_back(Item(2, 0, 3, 3, 1));
+	inputs.push_back(Item(3, 0, 6, 3, 2));
+	inputs.push_back(Item(4, 3, 1, 1, 2));
+	inputs.push_back(Item(4, 0, 3, 1, 0));
+	inputs.push_back(Item(6, 2, 5, 2, 6));
+	inputs.push_back(Item(4, 0, 3, 2, 2));
+	inputs.push_back(Item(4, 1, 0, 1, 2));
+	inputs.push_back(Item(5, 0, 4, 0, 4));
+	inputs.push_back(Item(4, 1, 1, 0, 1));
+	inputs.push_back(Item(1, 3, 0, 2, 1));
+	inputs.push_back(Item(1, 4, 6, 1, 1));
+	inputs.push_back(Item(1, 5, 0, 2, 1));
+	inputs.push_back(Item(1, 1, 2, 2, 1));
+	inputs.push_back(Item(3, 0, 3, 3, 2));
+	inputs.push_back(Item(4, 6, 5, 1, 3));
+	inputs.push_back(Item(3, 4, 3, 3, 2));
+	inputs.push_back(Item(2, 6, 3, 1, 3));
+	inputs.push_back(Item(3, 2, 0, 1, 2));
+	inputs.push_back(Item(2, 6, 0, 2, 2));
+	inputs.push_back(Item(3, 4, 1, 0, 3));
+	inputs.push_back(Item(2, 1, 0, 0, 4));
+	inputs.push_back(Item(4, 3, 0, 0, 0));
+	inputs.push_back(Item(2, 4, 0, 2, 5));
+	inputs.push_back(Item(4, 6, 2, 2, 3));
+	inputs.push_back(Item(4, 3, 2, 2, 3));
+	inputs.push_back(Item(4, 4, 2, 2, 3));
+	inputs.push_back(Item(4, 5, 2, 2, 3));
+	inputs.push_back(Item(4, 1, 6, 2, 3));
+	inputs.push_back(Item(4, 2, 2, 2, 3));
+	inputs.push_back(Item(0, 6, 0, 0, 1));
+	inputs.push_back(Item(0, 3, 0, 0, 1));
+	inputs.push_back(Item(0, 4, 0, 0, 1));
+	inputs.push_back(Item(0, 5, 0, 0, 1));
+	inputs.push_back(Item(0, 1, 0, 0, 1));
+	inputs.push_back(Item(0, 2, 0, 0, 1));
+	int a;
+
+	for (int i = 0; i < 100000; i++)
 	{
-		tmp = mlp.train(input, target);
+		a = rand() % 37;
+		mlp.train(inputs[a].getInput(), inputs[a].getResult());
 	}
-	std::cout << mlp.guess(input)[0] << std::endl;
+
+	//std::vector<double> testInputs;
+	//testInputs.push_back(0.203);
+	//testInputs.push_back(0.5);
+	mlp.saveWeights();
+	std::ofstream res;
+	res.open("Results.csv");
+	res << "Guess,Real\n";
+	for (int i = 0; i < 37; i++)
+	{
+		
+		res << 12*mlp.guess(inputs[i].getInput())[0] << "," << inputs[i].getDexterity() << "\n";
+		
+	}
+	res.close();
+	//std::cout << mlp.guess(inputs[1].getInput())[0] << std::endl;
+
 	system("pause");
 }

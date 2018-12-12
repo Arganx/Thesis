@@ -24,3 +24,14 @@ void Functions::normalise(std::vector<std::vector<std::vector<double>>>& values,
 		}
 	}
 }
+
+double Functions::f(double x, double y)
+{
+	return 2 * x - 0.8*y;
+}
+
+double Functions::fRand(double fMin, double fMax)
+{
+	double f = (double)rand() / RAND_MAX;
+	return fMin + f * (fMax - fMin);
+}

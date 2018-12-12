@@ -29,5 +29,7 @@ public:
 	void setError(double error) { this->error = error; };
 	std::vector<double> getWeights() { return weights; };
 	void setWeights(std::vector<double> weights);
+	double getBiasWeight() { return biasWeight; };
+	void setValueToBiastWeight(double weight) { this->biasWeight = weight; };
 };
 

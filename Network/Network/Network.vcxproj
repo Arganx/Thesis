@@ -119,6 +119,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MLP.cpp" />
     <ClCompile Include="Neuron.cpp" />
@@ -127,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Functions.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="MLP.h" />
     <ClInclude Include="Neuron.h" />
     <ClInclude Include="PNN.h" />
