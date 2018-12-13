@@ -9,6 +9,7 @@ Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
 	pathFinding = new PathFinding;
 	playerCanMove = true;
 	ai = false;
+	training = false;
 	this->size_x = sizeX;
 	this->size_y = sizeY;
 	int windowSize = std::min(windowSizeX,windowSizeY);

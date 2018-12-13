@@ -29,6 +29,8 @@ public:
 	Player* getRealPlayer() { return &player; };
 	bool getAI() { return ai; };
 	void setAI(bool ai) { this->ai = ai; };
+	bool getTraining() { return training; };
+	void setTraining(bool train) { this->training = train; };
 private:
 	Field*** fields;
 	int size_x;
@@ -41,6 +43,7 @@ private:
 	PathFinding* pathFinding;
 	bool playerCanMove;
 	bool ai;
+	bool training;
 
 };
 

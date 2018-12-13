@@ -19,6 +19,9 @@ Player::Player(int x, int y)
 		this->textureRect.height = 19;
 		this->strength = 0;
 		this->magic = 0;
+		this->dexterity = 0;
+		this->intelligence = 0;
+		this->charisma = 0;
 	}
 }
 
@@ -49,13 +52,17 @@ void Player::moveDown()
 
 void Player::printPlayerState()
 {
-	std::cout << "Player: strength - " << strength << " magic - " << magic << std::endl;
+	std::cout << "Player: strength - " << strength << " magic - " << magic << " dexterity - " << dexterity << " intelligence - "<< intelligence << " charisma - " << charisma<< std::endl;
 }
 
 void Player::pickUpItem(ItemType * itemType)
 {
 	std::cout << "Picked up " << itemType->getName() << std::endl;
 	strength += itemType->getStrength();
+	magic += itemType->getMagica();
+	dexterity += itemType->getDexterity();
+	intelligence += itemType->getIntelligence();
+	charisma += itemType->getCharisma();
 }
 
 void Player::resetPosition()

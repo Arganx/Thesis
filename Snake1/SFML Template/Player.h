@@ -22,5 +22,8 @@ private:
 	sf::IntRect textureRect;
 	int strength;
 	int magic;
+	int dexterity;
+	int intelligence;
+	int charisma;
 };
 
