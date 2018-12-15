@@ -7,7 +7,8 @@ private:
 	int numberOfInputs;
 	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
 	//double*** pointsInEachClass;// 1- numberOfClasses, 2-number of objects in each class, 3-objects
-	ProbabilityNeuron** neurons;
+	//ProbabilityNeuron** neurons;
+	std::vector<std::vector<ProbabilityNeuron>> neurons;
 	int max(std::vector<double> input);
 
 public:
@@ -15,6 +16,8 @@ public:
 	~PNN();
 	void SchowNeuronValues();
 	int classify(std::vector<double> inputs);
+	void saveClasses(std::string fileName);
+	void loadClasses(std::string fileName);
 	
 };
 

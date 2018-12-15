@@ -12,61 +12,72 @@ int main()
 {
 	srand((unsigned)time(NULL));
 	//PNN
-	/*
+	
 	std::vector <std::vector<std::vector<double>>> classes;
 
-	std::vector<std::vector<double>> nobjects1;
-	std::vector<double> obj1;
-	obj1.push_back(1.0);
-	obj1.push_back(3.0);
+	//std::vector<std::vector<double>> nobjects1;
+	//std::vector<double> obj1;
+	//obj1.push_back(1.0);
+	//obj1.push_back(3.0);
 
-	std::vector<double> obj2;
-	obj2.push_back(5.5);
-	obj2.push_back(5.0);
+	//std::vector<double> obj2;
+	//obj2.push_back(5.5);
+	//obj2.push_back(5.0);
 
-	std::vector<double> obj3;
-	obj3.push_back(3.0);
-	obj3.push_back(3.2);
+	//std::vector<double> obj3;
+	//obj3.push_back(3.0);
+	//obj3.push_back(3.2);
 
-	nobjects1.push_back(obj1);
-	nobjects1.push_back(obj2);
-	nobjects1.push_back(obj3);
+	//nobjects1.push_back(obj1);
+	//nobjects1.push_back(obj2);
+	//nobjects1.push_back(obj3);
 
-	std::vector<std::vector<double>> nobjects2;
-	std::vector<double> obj4;
-	obj4.push_back(50.0);
-	obj4.push_back(46.0);
+	//std::vector<std::vector<double>> nobjects2;
+	//std::vector<double> obj4;
+	//obj4.push_back(50.0);
+	//obj4.push_back(46.0);
 
-	std::vector<double> obj5;
-	obj5.push_back(58.8);
-	obj5.push_back(4.9);
+	//std::vector<double> obj5;
+	//obj5.push_back(58.8);
+	//obj5.push_back(4.9);
 
-	std::vector<double> obj6;
-	obj6.push_back(45.7);
-	obj6.push_back(70);
+	//std::vector<double> obj6;
+	//obj6.push_back(45.7);
+	//obj6.push_back(70);
 
-	nobjects2.push_back(obj4);
-	nobjects2.push_back(obj5);
-	nobjects2.push_back(obj6);
+	//nobjects2.push_back(obj4);
+	//nobjects2.push_back(obj5);
+	//nobjects2.push_back(obj6);
 
-	classes.push_back(nobjects1);
-	classes.push_back(nobjects2);
-	Functions functions;
-	functions.normalise(classes,150);
+	//classes.push_back(nobjects1);
+	//classes.push_back(nobjects2);
+	//Functions functions;
+	//functions.normalise(classes,150);
 	
 
-	PNN pnn = PNN(2, classes);
-	pnn.SchowNeuronValues();
+	PNN pnn = PNN(5, classes);
+	//pnn.saveClasses("Values");
+	//pnn.SchowNeuronValues();
 	std::vector<double> input;
-	input.push_back(30.0/150.0);
-	input.push_back(30.0/150.0);
+	/*input.push_back(30.0/150.0);
+	input.push_back(30.0/150.0);*/
+	input.push_back(6.0 );
+	input.push_back(2.0 );
+	input.push_back(6.0 );
+	input.push_back(2.0 );
+	input.push_back(6.0);
+
+	pnn.loadClasses("pnnStrength");
+
 	std::cout << pnn.classify(input) << std::endl;
-	*/
+	
+	
+	/*
 	//MLP
 	Neuron* neuron = new Neuron(2,0.1);
 	std::vector<int> neuronsInEachLayer;
+	neuronsInEachLayer.push_back(20);
 	neuronsInEachLayer.push_back(10);
-	neuronsInEachLayer.push_back(15);
 	MLP mlp = MLP(5,1,2, neuronsInEachLayer,"mlpWeights");
 	//Tests
 	
@@ -143,11 +154,11 @@ int main()
 	for (int i = 0; i < 37; i++)
 	{
 		
-		res << 12*mlp.guess(inputs[i].getInput())[0] << "," << inputs[i].getDexterity() << "\n";
+		res << 12.*mlp.guess(inputs[i].getInput())[0] << "," << inputs[i].getDexterity() << "\n";
 		
 	}
 	res.close();
 	//std::cout << mlp.guess(inputs[1].getInput())[0] << std::endl;
-
+	*/
 	system("pause");
 }

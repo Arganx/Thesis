@@ -2,7 +2,8 @@
 #include <iostream>
 #include "ProbabilityNeuron.h"
 #include <iostream>
-
+#include <fstream>
+#include <string>
 
 
 
@@ -25,18 +26,21 @@ PNN::PNN(int numberOfInputs, std::vector <std::vector<std::vector<double>>> poin
 {
 	this->numberOfInputs = numberOfInputs;
 	this->pointsInEachClass = pointsInEachClass;
-	neurons = new ProbabilityNeuron*[pointsInEachClass.size()];
-	std::cout << "Size 1: " << pointsInEachClass.size() << std::endl;
+	//std::cout << "Size 1: " << pointsInEachClass.size() << std::endl;
 	for (int i = 0; i<pointsInEachClass.size(); i++)
 	{
-		neurons[i] =new ProbabilityNeuron[pointsInEachClass[i].size()];
-		std::cout << "Size 2: " << pointsInEachClass[i].size() << std::endl;
+		std::vector<ProbabilityNeuron> tmp1;
+		tmp1.clear();
+		neurons.push_back(tmp1);
+		//std::cout << "Size 2: " << pointsInEachClass[i].size() << std::endl;
 		for (int j = 0; j<pointsInEachClass[i].size(); j++)
 		{
-			neurons[i][j].setNumberOfInputs(numberOfInputs);
-			neurons[i][j].setSigma(0.1);
-			neurons[i][j].setValues(pointsInEachClass[i][j]);
-			std::cout << neurons[i][j].getNumberOfInputs() << std::endl;
+			ProbabilityNeuron tmp2 = ProbabilityNeuron();
+			tmp2.setNumberOfInputs(numberOfInputs);
+			tmp2.setSigma(0.1);
+			tmp2.setValues(pointsInEachClass[i][j]);
+			neurons[i].push_back(tmp2);
+			//std::cout << neurons[i][j].getNumberOfInputs() << std::endl;
 		}
 	}
 
@@ -45,11 +49,7 @@ PNN::PNN(int numberOfInputs, std::vector <std::vector<std::vector<double>>> poin
 
 PNN::~PNN()
 {
-	for (int i = 0; i<pointsInEachClass.size(); i++)
-	{
-		delete[] neurons[i];
-	}
-	delete[] neurons;
+
 }
 
 void PNN::SchowNeuronValues()
@@ -84,3 +84,97 @@ int PNN::classify(std::vector<double> inputs)//TODO memory
 	}
 	return this->max(probability);
 }
+
+void PNN::saveClasses(std::string fileName)
+{
+	std::ofstream weights;
+	weights.open(fileName + ".csv");
+	
+	weights << pointsInEachClass.size() << '\n';
+	for (int i = 0; i<pointsInEachClass.size(); i++)
+	{
+		weights << pointsInEachClass[i].size() << '\n';
+		for (int j = 0; j<pointsInEachClass[i].size(); j++)
+		{
+			weights << neurons[i][j].getValues().size() << '\n';
+			for (int k = 0; k < neurons[i][j].getValues().size(); k++)
+			{
+				weights << neurons[i][j].getValues()[k] << ",";
+			}
+			weights << '\n';
+		}
+	}
+
+	weights.close();
+}
+
+void PNN::loadClasses(std::string fileName)
+{
+	std::ifstream weights(fileName + ".csv");
+	if (!weights.is_open())
+	{
+		std::cout << "Error could not load PNN classes" << std::endl;
+		return;
+	}
+
+
+
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+
+	std::string value;
+	int dim1,dim2,dim3;
+	std::getline(weights, value, '\n');//2
+	//std::cout << value << std::endl;
+	dim1 = std::stoi(value);
+
+	for (int i = 0; i < dim1; i++)
+	{
+		std::vector<std::vector<double>> cla;
+		cla.clear();
+		pointsInEachClass.push_back(cla);
+		std::getline(weights, value, '\n');//3
+		//std::cout << value << std::endl;
+		dim2= std::stoi(value);
+		for (int j = 0; j < dim2; j++)
+		{
+			std::getline(weights, value, '\n');//2
+			//std::cout << value << std::endl;
+			dim3 = std::stoi(value);
+			std::vector<double> values;
+			values.clear();
+			for (int k = 0; k < dim3; k++)
+			{
+				std::getline(weights, value, ',');
+				//std::cout << value << std::endl;
+				values.push_back(std::stod(value));
+			}
+			pointsInEachClass[i].push_back(values);
+			std::getline(weights, value, '\n');
+		}
+	}
+	weights.close();
+	this->pointsInEachClass = pointsInEachClass;
+
+	//constructor
+	neurons.clear();
+	for (int i = 0; i<pointsInEachClass.size(); i++)
+	{
+		std::vector<ProbabilityNeuron> tmp1;
+		tmp1.clear();
+		neurons.push_back(tmp1);
+		//std::cout << "Size 2: " << pointsInEachClass[i].size() << std::endl;
+		for (int j = 0; j<pointsInEachClass[i].size(); j++)
+		{
+			ProbabilityNeuron tmp2 = ProbabilityNeuron();
+			tmp2.setNumberOfInputs(numberOfInputs);
+			tmp2.setSigma(0.1);
+			tmp2.setValues(pointsInEachClass[i][j]);
+			neurons[i].push_back(tmp2);
+			//std::cout << neurons[i][j].getNumberOfInputs() << std::endl;
+		}
+	}
+
+	
+}
+
+

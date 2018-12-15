@@ -95,7 +95,7 @@ int MLP::train(std::vector<double> inputs, std::vector<double> targets)
 	for (int i = 0; i < targets.size(); i++)
 	{
 		errors.push_back(targets[i]- result[i]);
-		if (abs(errors[i]) > 0.05)
+		if (abs(errors[i]) > 0.0005)
 		{
 			end = false;
 		}
