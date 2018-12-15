@@ -1,15 +1,72 @@
 #include "Board.h"
 #include <iostream>
 #include <thread>
+#include <vector>
 
-Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player)
+
+
+Board::Board(int sizeX,int sizeY,int windowSizeX,int windowSizeY, Player player,bool mlp,bool training,int mode)
 	:player(player)
 {
 	items = new Items;
 	pathFinding = new PathFinding;
 	playerCanMove = true;
 	ai = false;
-	training = false;
+	this->mode = mode;
+	this->training = training;
+	this->mlp = mlp;
+	if (mlp)
+	{
+		//MLP
+		std::vector<int> tmp;
+		tmp.push_back(20);
+		tmp.push_back(10);
+		this->strengthNetwork = MLP(5, 1, 2, tmp, "StrengthWeights");
+		tmp.clear();
+		tmp.push_back(25);
+		tmp.push_back(20);
+		tmp.push_back(15);
+		this->magicaNetwork = MLP(5, 1, 3, tmp, "MagicaWeights");
+		tmp.clear();
+		tmp.push_back(20);
+		tmp.push_back(10);
+		this->dexterityNetwork = MLP(5,1,2,tmp,"DexterityWeights");
+		tmp.clear();
+		tmp.push_back(10);
+		tmp.push_back(5);
+		this->charismaNetwork = MLP(5,1,2,tmp,"CharismaWeights");
+		tmp.clear();
+		tmp.push_back(25);
+		tmp.push_back(20);
+		tmp.push_back(15);
+		this->intelligenceNetwork = MLP(5,2,3,tmp,"IntelligenceWeights");
+		if (!training)
+		{
+			strengthNetwork.loadWeights();
+			magicaNetwork.loadWeights();
+			dexterityNetwork.loadWeights();
+			charismaNetwork.loadWeights();
+			intelligenceNetwork.loadWeights();
+		}
+	}
+	else
+	{
+		//PNN
+		std::vector<std::vector<std::vector<double>>> vector;
+		strengthPNN = PNN(5, vector);
+		dexterityPNN = PNN(5, vector);
+		magicaPNN = PNN(5, vector);
+		intelligencePNN = PNN(5, vector);
+		charismaPNN = PNN(5, vector);
+		if (!training)
+		{
+			strengthPNN.loadClasses("pnnStrength");
+			dexterityPNN.loadClasses("pnnDexterity");
+			magicaPNN.loadClasses("pnnMagica");
+			intelligencePNN.loadClasses("pnnIntelligence");
+			charismaPNN.loadClasses("ppnCharisma");
+		}
+	}
 	this->size_x = sizeX;
 	this->size_y = sizeY;
 	int windowSize = std::min(windowSizeX,windowSizeY);
@@ -432,12 +489,32 @@ void Board::checkIfItem()
 			items->sortListByDistance(player.getPosition());
 			if (!items->getItemList().empty())
 			{
-				sf::Vector2i distance = pathFinding->findPath(player.getPosition(), items->getItemList().front().getPosition());
-				/*int x = getPlayer().getPosition().x;
-				int y = getPlayer().getPosition().y;*/
-				//Player* p = getRealPlayer();
-				std::thread t(threadFunction, this, distance);
-				t.detach();
+				std::list<Item> list = evaluate(items->getItemList());
+				if (!list.empty())
+				{
+					if (training && !mlp)
+					{
+						addToPnnItemTypePoints(type);
+					}
+					sf::Vector2i distance = pathFinding->findPath(player.getPosition(), list.front().getPosition());
+					/*int x = getPlayer().getPosition().x;
+					int y = getPlayer().getPosition().y;*/
+					//Player* p = getRealPlayer();
+					std::thread t(threadFunction, this, distance);
+					t.detach();
+				}
+			}
+			else if(!mlp && training)
+			{
+				
+				createNewPNN();
+				std::cout << "Koniec Levela" << std::endl;
+				strengthPNN.saveClasses("pnnStrength");
+				dexterityPNN.saveClasses("pnnDexterity");
+				magicaPNN.saveClasses("pnnMagica");
+				intelligencePNN.saveClasses("pnnIntelligence");
+				charismaPNN.saveClasses("ppnCharisma");
+
 			}
 			//TODO thread going to the gate
 		}
@@ -454,6 +531,385 @@ void Board::createItems(int numberOfItems)
 	{
 		itemNumber = rand() % this->items->getSize();
 		this->createItemOnBoard(itemNumber);
+	}
+}
+
+std::list<Item> Board::evaluate(std::list<Item> list)
+{
+	if (training)
+	{
+		return list;
+	}
+	std::vector<Item> it;
+	int size = list.size();
+	for (int i = 0; i < size; i++)
+	{
+		it.push_back(list.front());
+		list.pop_front();
+	}
+	for (int i = it.size()-1; i >= 0; i--)
+	{
+		if (classify(&it[i]))//wynik sieci delete
+		{
+			it.erase(it.begin() + i);
+		}
+	}
+	std::list<Item> list2;
+	for (int i = 0; i < it.size(); i++)
+	{
+		list2.push_back(it[i]);
+	}
+	
+	return list2;
+}
+
+bool Board::classify(Item * item)
+{
+	if (mlp)
+	{
+		std::vector<double> input;
+		input.push_back(item->getType()->getSize()/6.);
+		input.push_back(item->getType()->getColor()/6.);
+		input.push_back(item->getType()->getAgressivity()/6.);
+		input.push_back(item->getType()->getColorDifference()/6.);
+		input.push_back(item->getType()->getEpicLevel()/6.);
+		std::vector<double> strength = strengthNetwork.guess(input);
+		std::vector<double> dexterity = dexterityNetwork.guess(input);
+		std::vector<double> intelligence = intelligenceNetwork.guess(input);
+		std::vector<double> magica = magicaNetwork.guess(input);
+		std::vector<double> charisma = charismaNetwork.guess(input);
+		//std::cout << item->getType()->getName() << std::endl;
+		//std::cout << "Sila: " << strength[0]*12 << " powinna byc " << item->getType()->getStrength() <<std::endl;
+		//std::cout << "Zrecznosc: " << dexterity[0]*12 << " powinna byc " << item->getType()->getDexterity() << std::endl;
+		//std::cout << "Inteligencja: " << intelligence[0]*12 << " powinna byc " << item->getType()->getIntelligence() << std::endl;
+		//std::cout << "Magia: " << magica[0]*23 << " powinna byc " << item->getType()->getMagica() << std::endl;
+		//std::cout << "Charyzma: " << charisma[0]*3 << " powinna byc " << item->getType()->getCharisma() << std::endl;
+		//TODO classification function
+		if (mode == 0)
+		{
+			if (strength[0] * 12 <=0)
+			{
+				return true;
+			}
+		}
+		else if (mode == 1)
+		{
+			if (dexterity[0] * 12 <= 0)
+			{
+				return true;
+			}
+		}
+		else if (mode == 2)
+		{
+			if (intelligence[0] * 12 <= 0)
+			{
+				return true;
+			}
+		}
+		else if (mode == 3)
+		{
+			if (magica[0] * 23 <= 0)
+			{
+				return true;
+			}
+		}
+		else if (mode == 4)
+		{
+			if (charisma[0] * 3 <= 0)
+			{
+				return true;
+			}
+		}
+	}
+	else
+	{
+		std::vector<double> input;
+		input.push_back(item->getType()->getSize());
+		input.push_back(item->getType()->getColor());
+		input.push_back(item->getType()->getAgressivity());
+		input.push_back(item->getType()->getColorDifference());
+		input.push_back(item->getType()->getEpicLevel());
+		int strT = strengthPNN.classify(input);
+		int dexT = dexterityPNN.classify(input);
+		int intT = intelligencePNN.classify(input);
+		int magT = magicaPNN.classify(input);
+		int charT = charismaPNN.classify(input);
+
+		std::cout << item->getType()->getName() << std::endl;
+		std::cout << "Sila: " << strT << " powinna byc " << item->getType()->getStrengthTier()+3 << std::endl;
+		std::cout << "Zrecznosc: " << dexT << " powinna byc " << item->getType()->getDexterityTier()+3 << std::endl;
+		std::cout << "Inteligencja: " << intT << " powinna byc " << item->getType()->getIntelligenceTier()+3 << std::endl;
+		std::cout << "Magia: " << magT << " powinna byc " << item->getType()->getMagicaTier()+3 << std::endl;
+		std::cout << "Charyzma: " << charT << " powinna byc " << item->getType()->getCharismaTier()+3 << std::endl;
+		//TODO classify
+	}
+	return false;//Nie usowaj
+}
+
+void Board::createNewPNN()
+{
+
+	//Create PNNs
+	createStrengthPNN();
+	createDexterityPNN();
+	createMagicaPNN();
+	createIntelligencePNN();
+	createCharismaPNN();
+}
+
+void Board::createStrengthPNN()
+{
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+	std::vector<std::vector<double>> veryBad;
+	std::vector<std::vector<double>> bad;
+	std::vector<std::vector<double>> neutral;
+	std::vector<std::vector<double>> good;
+	std::vector<std::vector<double>> veryGood;
+
+	for (int i = 0; i < pnnItemTypePoints.size(); i++)
+	{
+		std::vector<double> help;
+		help.clear();
+		help.push_back(pnnItemTypePoints[i]->getSize());
+		help.push_back(pnnItemTypePoints[i]->getColor());
+		help.push_back(pnnItemTypePoints[i]->getAgressivity());
+		help.push_back(pnnItemTypePoints[i]->getColorDifference());
+		help.push_back(pnnItemTypePoints[i]->getEpicLevel());
+		switch (pnnItemTypePoints[i]->getStrengthTier())
+		{
+		case -2:
+			veryBad.push_back(help);
+			break;
+		case -1:
+			bad.push_back(help);
+			break;
+		case 0:
+			neutral.push_back(help);
+			break;
+		case 1:
+			good.push_back(help);
+			break;
+		case 2:
+			veryGood.push_back(help);
+			break;
+		default:
+			std::cout << "PNN classification error" << std::endl;
+			break;
+		}
+	}
+	pointsInEachClass.push_back(veryBad);
+	pointsInEachClass.push_back(bad);
+	pointsInEachClass.push_back(neutral);
+	pointsInEachClass.push_back(good);
+	pointsInEachClass.push_back(veryGood);
+	this->strengthPNN = PNN(5, pointsInEachClass);
+}
+
+void Board::createDexterityPNN()
+{
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+	std::vector<std::vector<double>> veryBad;
+	std::vector<std::vector<double>> bad;
+	std::vector<std::vector<double>> neutral;
+	std::vector<std::vector<double>> good;
+	std::vector<std::vector<double>> veryGood;
+
+	for (int i = 0; i < pnnItemTypePoints.size(); i++)
+	{
+		std::vector<double> help;
+		help.clear();
+		help.push_back(pnnItemTypePoints[i]->getSize());
+		help.push_back(pnnItemTypePoints[i]->getColor());
+		help.push_back(pnnItemTypePoints[i]->getAgressivity());
+		help.push_back(pnnItemTypePoints[i]->getColorDifference());
+		help.push_back(pnnItemTypePoints[i]->getEpicLevel());
+		switch (pnnItemTypePoints[i]->getDexterityTier())
+		{
+		case -2:
+			veryBad.push_back(help);
+			break;
+		case -1:
+			bad.push_back(help);
+			break;
+		case 0:
+			neutral.push_back(help);
+			break;
+		case 1:
+			good.push_back(help);
+			break;
+		case 2:
+			veryGood.push_back(help);
+			break;
+		default:
+			std::cout << "PNN classification error" << std::endl;
+			break;
+		}
+	}
+	pointsInEachClass.push_back(veryBad);
+	pointsInEachClass.push_back(bad);
+	pointsInEachClass.push_back(neutral);
+	pointsInEachClass.push_back(good);
+	pointsInEachClass.push_back(veryGood);
+	this->dexterityPNN = PNN(5, pointsInEachClass);
+}
+
+void Board::createMagicaPNN()
+{
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+	std::vector<std::vector<double>> veryBad;
+	std::vector<std::vector<double>> bad;
+	std::vector<std::vector<double>> neutral;
+	std::vector<std::vector<double>> good;
+	std::vector<std::vector<double>> veryGood;
+
+	for (int i = 0; i < pnnItemTypePoints.size(); i++)
+	{
+		std::vector<double> help;
+		help.clear();
+		help.push_back(pnnItemTypePoints[i]->getSize());
+		help.push_back(pnnItemTypePoints[i]->getColor());
+		help.push_back(pnnItemTypePoints[i]->getAgressivity());
+		help.push_back(pnnItemTypePoints[i]->getColorDifference());
+		help.push_back(pnnItemTypePoints[i]->getEpicLevel());
+		switch (pnnItemTypePoints[i]->getMagicaTier())
+		{
+		case -2:
+			veryBad.push_back(help);
+			break;
+		case -1:
+			bad.push_back(help);
+			break;
+		case 0:
+			neutral.push_back(help);
+			break;
+		case 1:
+			good.push_back(help);
+			break;
+		case 2:
+			veryGood.push_back(help);
+			break;
+		default:
+			std::cout << "PNN classification error" << std::endl;
+			break;
+		}
+	}
+	pointsInEachClass.push_back(veryBad);
+	pointsInEachClass.push_back(bad);
+	pointsInEachClass.push_back(neutral);
+	pointsInEachClass.push_back(good);
+	pointsInEachClass.push_back(veryGood);
+	this->magicaPNN = PNN(5, pointsInEachClass);
+}
+
+void Board::createIntelligencePNN()
+{
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+	std::vector<std::vector<double>> veryBad;
+	std::vector<std::vector<double>> bad;
+	std::vector<std::vector<double>> neutral;
+	std::vector<std::vector<double>> good;
+	std::vector<std::vector<double>> veryGood;
+
+	for (int i = 0; i < pnnItemTypePoints.size(); i++)
+	{
+		std::vector<double> help;
+		help.clear();
+		help.push_back(pnnItemTypePoints[i]->getSize());
+		help.push_back(pnnItemTypePoints[i]->getColor());
+		help.push_back(pnnItemTypePoints[i]->getAgressivity());
+		help.push_back(pnnItemTypePoints[i]->getColorDifference());
+		help.push_back(pnnItemTypePoints[i]->getEpicLevel());
+		switch (pnnItemTypePoints[i]->getIntelligenceTier())
+		{
+		case -2:
+			veryBad.push_back(help);
+			break;
+		case -1:
+			bad.push_back(help);
+			break;
+		case 0:
+			neutral.push_back(help);
+			break;
+		case 1:
+			good.push_back(help);
+			break;
+		case 2:
+			veryGood.push_back(help);
+			break;
+		default:
+			std::cout << "PNN classification error" << std::endl;
+			break;
+		}
+	}
+	pointsInEachClass.push_back(veryBad);
+	pointsInEachClass.push_back(bad);
+	pointsInEachClass.push_back(neutral);
+	pointsInEachClass.push_back(good);
+	pointsInEachClass.push_back(veryGood);
+	this->intelligencePNN = PNN(5, pointsInEachClass);
+}
+
+void Board::createCharismaPNN()
+{
+	std::vector <std::vector<std::vector<double>>> pointsInEachClass;
+	std::vector<std::vector<double>> veryBad;
+	std::vector<std::vector<double>> bad;
+	std::vector<std::vector<double>> neutral;
+	std::vector<std::vector<double>> good;
+	std::vector<std::vector<double>> veryGood;
+
+	for (int i = 0; i < pnnItemTypePoints.size(); i++)
+	{
+		std::vector<double> help;
+		help.clear();
+		help.push_back(pnnItemTypePoints[i]->getSize());
+		help.push_back(pnnItemTypePoints[i]->getColor());
+		help.push_back(pnnItemTypePoints[i]->getAgressivity());
+		help.push_back(pnnItemTypePoints[i]->getColorDifference());
+		help.push_back(pnnItemTypePoints[i]->getEpicLevel());
+		switch (pnnItemTypePoints[i]->getCharismaTier())
+		{
+		case -2:
+			veryBad.push_back(help);
+			break;
+		case -1:
+			bad.push_back(help);
+			break;
+		case 0:
+			neutral.push_back(help);
+			break;
+		case 1:
+			good.push_back(help);
+			break;
+		case 2:
+			veryGood.push_back(help);
+			break;
+		default:
+			std::cout << "PNN classification error" << std::endl;
+			break;
+		}
+	}
+	pointsInEachClass.push_back(veryBad);
+	pointsInEachClass.push_back(bad);
+	pointsInEachClass.push_back(neutral);
+	pointsInEachClass.push_back(good);
+	pointsInEachClass.push_back(veryGood);
+	this->charismaPNN = PNN(5, pointsInEachClass);
+}
+
+void Board::addToPnnItemTypePoints(ItemType * type)
+{
+	bool tmp = true;
+	for (int j = 0; j < pnnItemTypePoints.size(); j++)
+	{
+		if (pnnItemTypePoints[j]->getName() == type->getName())
+		{
+			tmp = false;
+		}
+	}
+	if (tmp)
+	{
+		pnnItemTypePoints.push_back(type);
 	}
 }
 

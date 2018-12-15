@@ -155,8 +155,12 @@
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="ItemType.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MLP.cpp" />
+    <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PNN.cpp" />
+    <ClCompile Include="ProbabilityNeuron.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
@@ -164,8 +168,12 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="Items.h" />
     <ClInclude Include="ItemType.h" />
+    <ClInclude Include="MLP.h" />
+    <ClInclude Include="Neuron.h" />
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PNN.h" />
+    <ClInclude Include="ProbabilityNeuron.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\textures\player.png" />

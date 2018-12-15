@@ -6,10 +6,12 @@
 #include "Item.h"
 #include "Items.h"
 #include "PathFinding.h"
+#include "MLP.h"
+#include "PNN.h"
 class Board
 {
 public:
-	Board(int sizeX, int sizeY, int windowSizeX, int windowSizeY,Player player);
+	Board(int sizeX, int sizeY, int windowSizeX, int windowSizeY,Player player,bool mlp,bool training,int mode);
 	~Board();
 	void draw(sf::RenderWindow& window);
 	void goLeft();
@@ -44,6 +46,27 @@ private:
 	bool playerCanMove;
 	bool ai;
 	bool training;
-
+	std::list<Item> evaluate(std::list<Item> list);
+	bool classify(Item* item);
+	MLP strengthNetwork;
+	MLP dexterityNetwork;
+	MLP intelligenceNetwork;
+	MLP magicaNetwork;
+	MLP charismaNetwork;
+	bool mlp;
+	PNN strengthPNN;
+	PNN dexterityPNN;
+	PNN intelligencePNN;
+	PNN magicaPNN;
+	PNN charismaPNN;
+	void createNewPNN();
+	void createStrengthPNN();
+	void createDexterityPNN();
+	void createMagicaPNN();
+	void createIntelligencePNN();
+	void createCharismaPNN();
+	std::vector<ItemType*> pnnItemTypePoints;
+	void addToPnnItemTypePoints(ItemType* type);
+	int mode;
 };
 

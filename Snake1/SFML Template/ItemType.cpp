@@ -28,6 +28,114 @@ ItemType::ItemType(std::string name,
 	this->intelligence= calculateIntelligence(size, color, agressivity, colorDifference, epicLevel);
 	this->charisma = calculateCharisma(size, color, agressivity, colorDifference, epicLevel);
 	this->state = state;
+	//Strength -12 12
+	if (strength < -6)
+	{
+		strengthTier = -2;
+	}
+	else if (strength < -1)
+	{
+		strengthTier = -1;
+	}
+	else if (strength <= 1)
+	{
+		strengthTier = 0;
+	}
+	else if (strength <= 6)
+	{
+		strengthTier = 1;
+	}
+	else
+	{
+		strengthTier = 2;
+	}
+	//Dexterity -12 12
+	if (dexterity < -6)
+	{
+		dexterityTier = -2;
+	}
+	else if (dexterity < -1)
+	{
+		dexterityTier = -1;
+	}
+	else if (dexterity <= 1)
+	{
+		dexterityTier = 0;
+	}
+	else if (dexterity <= 6)
+	{
+		dexterityTier = 1;
+	}
+	else
+	{
+		dexterityTier = 2;
+	}
+
+	//Magica -12	23
+	if (magica < -6)
+	{
+		magicaTier = -2;
+	}
+	else if (magica < -1)
+	{
+		magicaTier = -1;
+	}
+	else if (magica <= 1)
+	{
+		magicaTier = 0;
+	}
+	else if (magica <= 12)
+	{
+		magicaTier = 1;
+	}
+	else
+	{
+		magicaTier = 2;
+	}
+
+	//Intelligence -6	11
+	if (intelligence < -3)
+	{
+		intelligenceTier = -2;
+	}
+	else if (intelligence < -1)
+	{
+		intelligenceTier = -1;
+	}
+	else if (intelligence <= 1)
+	{
+		intelligenceTier = 0;
+	}
+	else if (intelligence <= 6)
+	{
+		intelligenceTier = 1;
+	}
+	else
+	{
+		intelligenceTier = 2;
+	}
+
+	//Charisma -3	3
+	if (charisma < -2)
+	{
+		charismaTier = -2;
+	}
+	else if (charisma < 0)
+	{
+		charismaTier = -1;
+	}
+	else if (charisma==0)
+	{
+		charismaTier = 0;
+	}
+	else if (charisma <= 2)
+	{
+		charismaTier = 1;
+	}
+	else
+	{
+		charismaTier = 2;
+	}
 }
 
 

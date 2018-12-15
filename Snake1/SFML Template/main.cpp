@@ -7,11 +7,9 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280,720),"SFML Template");
 	Player player(0,0);
-	Board board(10,10, 1280, 720,player);
+	Board board(10,10, 1280, 720,player,true,false,0);
 	window.setFramerateLimit(30);
 	board.setAI(true);
-	board.setTraining(true);
-	
 	while (window.isOpen())
 	{
 		//handle events
